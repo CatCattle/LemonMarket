@@ -14,10 +14,12 @@ public class DatabaseCleaner {
              Statement stmt = conn.createStatement()) {
 
             // 假设我们有一个表的名称列表
-            String[] tables = {"buyers", "cars_for_sale", "dealers", "inventory", "sellers"};
+            String[] tables = {"buyers", "cars", "dealers", "sellers"};
 
             for (String table : tables) {
                 // 使用 DELETE 语句
+                String deleteInventorySql = "DELETE FROM inventory";
+                stmt.executeUpdate(deleteInventorySql);
                 String deleteSql = "DELETE FROM " + table;
                 stmt.executeUpdate(deleteSql);
 

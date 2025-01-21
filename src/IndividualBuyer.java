@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class IndividualBuyer {
     private static int lastBuyerID = 0;
     private int buyerID;
@@ -12,7 +14,7 @@ public class IndividualBuyer {
         this.carDemand = new CarDemand(100000, 'C', 0.5);
     }
 
-    public static class CarDemand {
+    public class CarDemand {
         private int demandPrice;
         private char targetLevel;
         private double deprecationFactor;
@@ -86,6 +88,13 @@ public class IndividualBuyer {
         return carDemand;
     }
 
+    public int getDemandPrice() {
+        return carDemand.getDemandPrice();
+    }
+
+    public int getTargetLevel() {
+        return carDemand.getTargetLevel();
+    }
     // 设置Z属性
     public void setZ(double z) {
         this.z = z;
@@ -110,6 +119,12 @@ public class IndividualBuyer {
     // 出价逻辑
     public boolean bid(Car car) {
         // 出价逻辑
-        return true;
+        Random random = new Random();
+        int num = random.nextInt(1);
+        if (num > 0.5) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

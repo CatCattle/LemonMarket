@@ -1,12 +1,16 @@
 import java.util.Arrays;
+import java.util.Random;
 
 public class Dealer {
+    private static int dealerCount = 0;
+    private int dealerID;
     private Car[] inventory;
-    private long balance;
-    private long netProfit;
+    private int balance;
+    private int netProfit;
     private int inventoryCount;
 
     public Dealer() {
+        this.dealerID = ++dealerCount;
         this.inventory = new Car[10];
         this.balance = 500000;
         this.netProfit = 0;
@@ -19,11 +23,23 @@ public class Dealer {
 
     public void buyCar(Car car) {
         // Implementation for buying a car
+        addCarToInventory(car);
+        car.setOwner(Car.Owner.DEALER);
+        balance -= car.getCurrentValue();
+        netProfit -= car.getCurrentValue();
     }
 
-    public double bid(Car car) {
+    public void sellCar(Car car) {
+        removeCarFromInventory(car);
+        balance += car.getCurrentValue();
+        netProfit += car.getCurrentValue();
+    }
+
+    public int bid(Car car) {
         // Implement the bidding logic here
-        return 0; // Replace with actual bid value
+        Random random = new Random();
+        int randomInt = random.nextInt(30000) + 10000;
+        return randomInt; // Replace with actual bid value
     }
 
     public void priceCarsForSale() {
@@ -58,19 +74,19 @@ public class Dealer {
         return inventory;
     }
 
-    public long getBalance() {
+    public int getBalance() {
         return balance;
     }
 
-    public void setBalance(long balance) {
+    public void setBalance(int balance) {
         this.balance = balance;
     }
 
-    public long getNetProfit() {
+    public int getNetProfit() {
         return netProfit;
     }
 
-    public void setNetProfit(long netProfit) {
+    public void setNetProfit(int netProfit) {
         this.netProfit = netProfit;
     }
 
@@ -88,12 +104,13 @@ public class Dealer {
         return null; // No car available for sale
     }
 
-    public void sellCar(Car car, IndividualBuyer buyer) {
-    }
-
     @Override
     public String toString() {
         return String.format("Dealer{balance=%d, netProfit=%d, inventoryCount=%d}", balance, netProfit, inventoryCount);
+    }
+
+    public int getDealerID() {
+        return this.dealerID;
     }
 
 }

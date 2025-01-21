@@ -6,14 +6,19 @@ import java.sql.*;
 public class Car {
     private static final Set<String> usedIds = new HashSet<>();
     private static final int[] PRICES = {100000, 200000, 400000};
+
+    public enum Owner {
+        DEALER, SELLER
+    }
     private String id;
-    private char level;
+    private String level;
     private int originalPrice;
     private boolean lemon;
     private double depreciationFactor;
     private int currentValue;
-    private int rounds;
+    private int round;
     private int price;
+    private Owner owner;
 
     // 数据库连接信息
     private static final String URL = "jdbc:mysql://localhost:3306/lemon_market";
@@ -28,27 +33,33 @@ public class Car {
         this.lemon = setLemon();
         this.depreciationFactor = generateDepreciationFactor();
         this.currentValue = calculateCurrentValue();
-        this.rounds = 0;
+        this.round = 0;
         this.price = 0;
+        this.owner = Owner.SELLER;
+    }
+
+    public Car(Owner owner) {
+        this();
+        this.owner = owner;
     }
 
     public static Car getCarByID(String sellCarID) {
-        String sql = "SELECT * FROM cars WHERE id = ?";
+        String sql = "SELECT * FROM cars WHERE CarID = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, sellCarID);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    // 假设 cars 表中有 id, level, originalPrice, lemon, depreciationFactor 等列
-                    String id = rs.getString("id");
-                    char level = rs.getString("level").charAt(0);
-                    int originalPrice = rs.getInt("originalPrice");
-                    boolean lemon = rs.getBoolean("lemon");
-                    double depreciationFactor = rs.getDouble("depreciationFactor");
-                    int currentValue = rs.getInt("currentValue");
-                    int rounds = rs.getInt("rounds");
-                    int price = rs.getInt("price");
+                    String id = rs.getString("CarID");
+                    String level = rs.getString("Level");
+                    int originalPrice = rs.getInt("OriginalPrice");
+                    boolean lemon = rs.getBoolean("Lemon");
+                    double depreciationFactor = rs.getDouble("DF");
+                    int currentValue = rs.getInt("CurrentValue");
+                    int round = rs.getInt("Round");
+                    int price = rs.getInt("Price");
+
 
                     Car car = new Car();
                     car.id = id;
@@ -57,7 +68,7 @@ public class Car {
                     car.lemon = lemon;
                     car.depreciationFactor = depreciationFactor;
                     car.currentValue = currentValue;
-                    car.rounds = rounds;
+                    car.round = round;
                     car.price = price;
                     return car;
                 }
@@ -80,8 +91,8 @@ public class Car {
     }
 
     // 设置车辆级别
-    private char setLevel() {
-        char[] levels = {'A', 'B', 'C'};
+    private String setLevel() {
+        String[] levels = {"A", "B", "C"};
         double[] probabilities = {0.5, 0.3, 0.2};
         double p = Math.random();
         double cumulativeProbability = 0.0;
@@ -91,17 +102,17 @@ public class Car {
                 return levels[i];
             }
         }
-        return 'A'; // 默认返回A级
+        return "A"; // 默认返回A级
     }
 
     // 设置车辆原始价格
     private int setOriginalPrice() {
         switch (this.level) {
-            case 'A':
+            case "A":
                 return PRICES[0];
-            case 'B':
+            case "B":
                 return PRICES[1];
-            case 'C':
+            case "C":
                 return PRICES[2];
             default:
                 return PRICES[0];
@@ -136,15 +147,19 @@ public class Car {
     }
 
     // 获取轮次
-    public int getRounds() {
-        return this.rounds;
+    public int getRound() {
+        return this.round;
     }
 
    // 车的贬值方法
    public void depreciate() {
-    // 每轮贬值10%
-    this.currentValue *= 0.9;
-}
+        // 每轮贬值10%
+        this.currentValue *= 0.9;
+    }
+
+    public String getCarID() {
+        return this.id;
+    }
 
     public double getDepreciationFactor() {
         return this.depreciationFactor;
@@ -155,9 +170,36 @@ public class Car {
 
     @Override
     public String toString() {
-        return String.format("Car{id='%s', level=%c, originalPrice=%d, lemon=%b, depreciationFactor=%.3f, currentValue=%d, rounds=%d, price=%d}",
-                id, level, originalPrice, lemon, depreciationFactor, currentValue, rounds, price);
+        return String.format("Car{id='%s', level=%s, originalPrice=%d, lemon=%b, depreciationFactor=%.3f, currentValue=%d, round=%d, price=%d}",
+                id, level, originalPrice, lemon, depreciationFactor, currentValue, round, price);
     }
 
 
+    public String getLevel() {
+        return this.level;
+    }
+
+    public int getOriginalPrice() {
+        return this.originalPrice;
+    }
+
+    public boolean isLemon() {
+        return this.lemon;
+    }
+
+    public int getPrice() {
+        return this.price;
+    }
+
+    public void nextRound() {
+        this.round++;
+    }
+
+    public Car.Owner getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Car.Owner owner) {
+        this.owner = owner;
+    }
 }
